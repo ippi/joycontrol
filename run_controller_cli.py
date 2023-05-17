@@ -136,7 +136,27 @@ async def test_controller_buttons(controller_state: ControllerState):
 
     # go back to home
     await button_push(controller_state, 'home')
+    
+async def zalda_amiibo_seq(controller_state: ControllerState):
+    """
+    Example controller script.
+    Navigates to the "Test Controller Buttons" menu and presses all buttons.
+    """
+    if controller_state.get_controller() != Controller.PRO_CONTROLLER:
+        raise ValueError('This script only works with the Pro Controller!')
 
+    # waits until controller is fully connected
+    await controller_state.connect()
+    
+    for i in range(1,26):
+        await button_push(controller_state, 'l')
+        await asyncio.sleep(0.3)
+        nfc_file = '/media/pi/160G/download/old/SaierdaAmiibo/' + i + '.bin'
+        controller_state.set_nfc(NFCTag.load_amiibo(nfc_file))
+        print("added nfc content " + i)
+        await asyncio.sleep(0.5)
+        controller_state.set_nfc(None)
+        await button_push(controller_state, 'l_stick', 'right, sec=0.3)
 
 def ensure_valid_button(controller_state, *buttons):
     """
@@ -290,6 +310,14 @@ def _register_commands_with_controller_state(controller_state, cli):
         controller_state._protocol.unpause()
 
     cli.add_command(unpause.__name__, unpause)
+    
+    async def zelda():
+        """
+        zelda - zelda
+        """
+        await zalda_amiibo_seq(controller_state)
+
+    cli.add_command(zelda.__name__, zelda)
 
 async def _main(args):
     # Get controller name to emulate from arguments
