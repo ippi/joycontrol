@@ -156,7 +156,7 @@ async def zalda_amiibo_seq(controller_state: ControllerState):
         print("added nfc content " + i)
         await asyncio.sleep(0.5)
         controller_state.set_nfc(None)
-        await button_push(controller_state, 'l_stick', 'right, sec=0.3)
+        await button_push(controller_state, ['l_stick', 'right'], sec=0.3)
 
 def ensure_valid_button(controller_state, *buttons):
     """
